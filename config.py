@@ -4,19 +4,21 @@ import pytz
 import os
 
 DEBUG = True  # Defina como True para modo de teste, False para produção
-TIMEZONE = pytz.timezone('America/Sao_Paulo')  # Substitua pelo seu fuso horário
+TIMEZONE = pytz.timezone("America/Sao_Paulo")  # Substitua pelo seu fuso horário
 
 # Configurações do Google Sheets
-GOOGLE_SHEETS_CREDENTIALS = "path/to/credentials.json"  # Caminho para o arquivo JSON das credenciais
-GOOGLE_SHEETS_SPREADSHEET = "Nome da Planilha"         # Nome da planilha no Google Sheets
-GOOGLE_SHEETS_WORKSHEET = "Nome da Worksheet"         # Nome da worksheet dentro da planilha
+GOOGLE_SHEETS_CREDENTIALS = (
+    "path/to/credentials.json"  # Caminho para o arquivo JSON das credenciais
+)
+GOOGLE_SHEETS_SPREADSHEET = "Nome da Planilha"  # Nome da planilha no Google Sheets
+GOOGLE_SHEETS_WORKSHEET = "Nome da Worksheet"  # Nome da worksheet dentro da planilha
 
 
-TOKEN = "SEU_TOKEN_AQUI" ## Token discord
+TOKEN = "SEU_TOKEN_AQUI"  ## Token discord
 
 # IDs dos canais (Substitua pelos IDs reais)
 GOOD_AFTERNOON_CHANNEL_ID = 123456789012345678  # Canal de boas tardes
-AVISOS_GERAIS_CANAL = 123456789012345678       # Canal de avisos gerais
+AVISOS_GERAIS_CANAL = 123456789012345678  # Canal de avisos gerais
 CANAL_DOIS_ID = 123456789012345678  # Canal exemplo dois
 
 
@@ -68,4 +70,3 @@ CAHAMADA_MESSAGES = [
     "🐘 Elefantes são os únicos animais que não conseguem pular.",
     # Adicione mais mensagens conforme necessário
 ]
-

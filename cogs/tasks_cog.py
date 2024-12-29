@@ -28,14 +28,12 @@ import asyncio
 from database import session
 from models import Settings
 import logging
- 
-
-
 
 
 # Função auxiliar para retornar a data/hora no fuso definido.
 def get_now():
     return datetime.datetime.now(TIMEZONE)
+
 
 # Função para conectar ao Google Sheets (em stand by)
 def conectar_google_sheets():
@@ -56,20 +54,37 @@ def conectar_google_sheets():
         # O log de erro será tratado pela task que chama esta função
         raise e
 
+
 class TasksCog(commands.Cog):
     def __init__(self, bot: commands.Bot, geral_logger: logging.Logger):
         self.bot = bot
         self.geral_logger = geral_logger
 
         # Configuração dos loggers específicos para cada task
-        self.task_semanal_logger = self.setup_logger("discord_bot.task_semanal", "task_semanal.log")
-        self.task_good_afternoon_logger = self.setup_logger("discord_bot.task_good_afternoon", "task_good_afternoon.log")
-        self.task_ajustar_ponto_logger = self.setup_logger("discord_bot.task_ajustar_ponto", "ajustar_ponto.log")
-        self.task_quinzenal_logger = self.setup_logger("discord_bot.task_quinzenal", "quinzenal_message.log")
-        self.task_enviar_realocacao_ticket_logger = self.setup_logger("discord_bot.task_enviar_realocacao_ticket", "enviar_realocacao_ticket.log")
-        self.task_oracle_configuracao_logger = self.setup_logger("discord_bot.task_oracle_configuracao", "oracle_configuracao.log")
-        self.task_enviar_aviso_excel_logger = self.setup_logger("discord_bot.task_enviar_aviso_excel", "enviar_aviso_excel.log")
-        self.task_mundo_animal_logger = self.setup_logger("discord_bot.task_mundo_animal", "mundo_animal.log")  
+        self.task_semanal_logger = self.setup_logger(
+            "discord_bot.task_semanal", "task_semanal.log"
+        )
+        self.task_good_afternoon_logger = self.setup_logger(
+            "discord_bot.task_good_afternoon", "task_good_afternoon.log"
+        )
+        self.task_ajustar_ponto_logger = self.setup_logger(
+            "discord_bot.task_ajustar_ponto", "ajustar_ponto.log"
+        )
+        self.task_quinzenal_logger = self.setup_logger(
+            "discord_bot.task_quinzenal", "quinzenal_message.log"
+        )
+        self.task_enviar_realocacao_ticket_logger = self.setup_logger(
+            "discord_bot.task_enviar_realocacao_ticket", "enviar_realocacao_ticket.log"
+        )
+        self.task_oracle_configuracao_logger = self.setup_logger(
+            "discord_bot.task_oracle_configuracao", "oracle_configuracao.log"
+        )
+        self.task_enviar_aviso_excel_logger = self.setup_logger(
+            "discord_bot.task_enviar_aviso_excel", "enviar_aviso_excel.log"
+        )
+        self.task_mundo_animal_logger = self.setup_logger(
+            "discord_bot.task_mundo_animal", "mundo_animal.log"
+        )
 
         # Iniciar as tasks (elas só rodam quando o bot está pronto).
         self.semanal_message_task.start()
@@ -79,7 +94,7 @@ class TasksCog(commands.Cog):
         self.enviar_realocacao_ticket.start()
         self.oracle_configuracao_task.start()
         self.enviar_aviso_excel.start()
-        self.mundo_animal_task.start() 
+        self.mundo_animal_task.start()
 
     def setup_logger(self, logger_name: str, log_filename: str) -> logging.Logger:
         """
@@ -87,8 +102,10 @@ class TasksCog(commands.Cog):
         """
         logger = logging.getLogger(logger_name)
         logger.setLevel(logging.INFO)
-        log_file_path = os.path.join('logs', log_filename)
-        handler = logging.FileHandler(filename=log_file_path, encoding="utf-8", mode="a")
+        log_file_path = os.path.join("logs", log_filename)
+        handler = logging.FileHandler(
+            filename=log_file_path, encoding="utf-8", mode="a"
+        )
         formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
@@ -99,8 +116,12 @@ class TasksCog(commands.Cog):
     # =====================================================
     @commands.Cog.listener()
     async def on_ready(self):
-        self.geral_logger.info(f"INICIALIZAÇÃO - Cog de Tasks carregado!Bot conectado como {self.bot.user}")
-        print(f"INICIALIZAÇÃO - Cog de Tasks carregado! Bot conectado como {self.bot.user}")
+        self.geral_logger.info(
+            f"INICIALIZAÇÃO - Cog de Tasks carregado!Bot conectado como {self.bot.user}"
+        )
+        print(
+            f"INICIALIZAÇÃO - Cog de Tasks carregado! Bot conectado como {self.bot.user}"
+        )
 
     # =====================================================
     # Tarefa: Mensagem Semanal (uma vez por semana, qualquer dia entre 09:00 e 18:00)
@@ -145,7 +166,9 @@ class TasksCog(commands.Cog):
                                 session.add(new_setting)
                             session.commit()
                         except Exception as e:
-                            self.task_semanal_logger.exception(f"Erro ao enviar mensagem semanal: {e}")
+                            self.task_semanal_logger.exception(
+                                f"Erro ao enviar mensagem semanal: {e}"
+                            )
                             print(f"Erro ao enviar mensagem semanal: {e}")
                     else:
                         self.task_semanal_logger.error(
@@ -153,10 +176,14 @@ class TasksCog(commands.Cog):
                         )
                         print(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
             else:
-                self.task_semanal_logger.info("Mensagem semanal já foi enviada esta semana.")
+                self.task_semanal_logger.info(
+                    "Mensagem semanal já foi enviada esta semana."
+                )
                 print("Mensagem semanal já foi enviada esta semana.")
         except Exception as e:
-            self.task_semanal_logger.exception(f"Erro na task semanal_message_task: {e}")
+            self.task_semanal_logger.exception(
+                f"Erro na task semanal_message_task: {e}"
+            )
 
     @semanal_message_task.before_loop
     async def before_semanal_message_task(self):
@@ -164,9 +191,7 @@ class TasksCog(commands.Cog):
         self.task_semanal_logger.info("Tarefa semanal_message_task iniciada.")
         print("Tarefa semanal_message_task iniciada.")
 
-
-
-## listar canais no discord
+    ## listar canais no discord
     def listar_canais_acessiveis(self):
         """
         Lista todos os canais que o bot pode acessar na guilda.
@@ -185,10 +210,10 @@ class TasksCog(commands.Cog):
         canais = self.listar_canais_acessiveis()
         mensagem = "Canais que o bot pode acessar:\n"
         for guild_name, channel_id, channel_name in canais:
-            mensagem += f"Guilda: {guild_name} | ID: {channel_id} | Nome: {channel_name}\n"
+            mensagem += (
+                f"Guilda: {guild_name} | ID: {channel_id} | Nome: {channel_name}\n"
+            )
         await ctx.send(mensagem)
-
-
 
     # =====================================================
     # Tarefa de 15 em 15 minutos
@@ -207,11 +232,17 @@ class TasksCog(commands.Cog):
                         f"[{now.strftime('%H:%M:%S')}] Mensagem de teste enviada no canal {GOOD_AFTERNOON_CHANNEL_ID}."
                     )
                 except Exception as e:
-                    self.task_good_afternoon_logger.exception(f"Erro ao enviar mensagem de teste: {e}")
+                    self.task_good_afternoon_logger.exception(
+                        f"Erro ao enviar mensagem de teste: {e}"
+                    )
             else:
-                self.task_good_afternoon_logger.error(f"Canal com ID {GOOD_AFTERNOON_CHANNEL_ID} não encontrado.")
+                self.task_good_afternoon_logger.error(
+                    f"Canal com ID {GOOD_AFTERNOON_CHANNEL_ID} não encontrado."
+                )
         except Exception as e:
-            self.task_good_afternoon_logger.exception(f"Erro na task send_good_afternoon_message: {e}")
+            self.task_good_afternoon_logger.exception(
+                f"Erro na task send_good_afternoon_message: {e}"
+            )
 
     # =====================================================
     # Tarefa para enviar lembrete de ajustar ponto
@@ -240,11 +271,17 @@ class TasksCog(commands.Cog):
                             f"[{now.strftime('%Y-%m-%d %H:%M')}] Alerta de ponto enviado no canal {AVISOS_GERAIS_CANAL}."
                         )
                     except Exception as e:
-                        self.task_ajustar_ponto_logger.exception(f"Erro ao enviar alerta de ponto: {e}")
+                        self.task_ajustar_ponto_logger.exception(
+                            f"Erro ao enviar alerta de ponto: {e}"
+                        )
                 else:
-                    self.task_ajustar_ponto_logger.error(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
+                    self.task_ajustar_ponto_logger.error(
+                        f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado."
+                    )
         except Exception as e:
-            self.task_ajustar_ponto_logger.exception(f"Erro na task ajustar_ponto_task: {e}")
+            self.task_ajustar_ponto_logger.exception(
+                f"Erro na task ajustar_ponto_task: {e}"
+            )
 
     # =====================================================
     # Tarefa para enviar mensagem quinzenalmente
@@ -271,9 +308,13 @@ class TasksCog(commands.Cog):
                                 f"Erro ao enviar mensagem quinzenal no canal {channel_id}: {e}"
                             )
                 # Atualiza o índice (rotação circular)
-                self.quinzenal_index = (self.quinzenal_index + 1) % len(QUINZENAL_MESSAGES)
+                self.quinzenal_index = (self.quinzenal_index + 1) % len(
+                    QUINZENAL_MESSAGES
+                )
         except Exception as e:
-            self.task_quinzenal_logger.exception(f"Erro na task quinzenal_message_task: {e}")
+            self.task_quinzenal_logger.exception(
+                f"Erro na task quinzenal_message_task: {e}"
+            )
 
     @quinzenal_message_task.before_loop
     async def before_quinzenal_message_task(self):
@@ -311,9 +352,13 @@ class TasksCog(commands.Cog):
                             f"Erro ao enviar mensagem de realocação no canal {REALOCACAO_CANAL}: {e}"
                         )
                 else:
-                    self.task_enviar_realocacao_ticket_logger.error(f"Canal com ID {REALOCACAO_CANAL} não encontrado.")
+                    self.task_enviar_realocacao_ticket_logger.error(
+                        f"Canal com ID {REALOCACAO_CANAL} não encontrado."
+                    )
         except Exception as e:
-            self.task_enviar_realocacao_ticket_logger.exception(f"Erro na task enviar_realocacao_ticket: {e}")
+            self.task_enviar_realocacao_ticket_logger.exception(
+                f"Erro na task enviar_realocacao_ticket: {e}"
+            )
 
     # =====================================================
     # Task: Enviar Mensagem Oracle Configuração (Mensal)
@@ -356,26 +401,37 @@ class TasksCog(commands.Cog):
                                 setting.value = str(current_month)
                             else:
                                 new_setting = Settings(
-                                    key="last_month_oracle_sent", value=str(current_month)
+                                    key="last_month_oracle_sent",
+                                    value=str(current_month),
                                 )
                                 session.add(new_setting)
                             session.commit()
                         except Exception as e:
-                            self.task_oracle_configuracao_logger.exception(f"Erro ao enviar mensagem Oracle: {e}")
+                            self.task_oracle_configuracao_logger.exception(
+                                f"Erro ao enviar mensagem Oracle: {e}"
+                            )
                             print(f"Erro ao enviar mensagem Oracle: {e}")
                     else:
-                        self.task_oracle_configuracao_logger.error(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
+                        self.task_oracle_configuracao_logger.error(
+                            f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado."
+                        )
                         print(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
             else:
-                self.task_oracle_configuracao_logger.info("Mensagem Oracle já foi enviada este mês.")
+                self.task_oracle_configuracao_logger.info(
+                    "Mensagem Oracle já foi enviada este mês."
+                )
                 print("Mensagem Oracle já foi enviada este mês.")
         except Exception as e:
-            self.task_oracle_configuracao_logger.exception(f"Erro na task oracle_configuracao_task: {e}")
+            self.task_oracle_configuracao_logger.exception(
+                f"Erro na task oracle_configuracao_task: {e}"
+            )
 
     @oracle_configuracao_task.before_loop
     async def before_oracle_configuracao_task(self):
         await self.bot.wait_until_ready()
-        self.task_oracle_configuracao_logger.info("Tarefa oracle_configuracao_task iniciada.")
+        self.task_oracle_configuracao_logger.info(
+            "Tarefa oracle_configuracao_task iniciada."
+        )
         print("Tarefa oracle_configuracao_task iniciada.")
 
     # =====================================================
@@ -384,10 +440,14 @@ class TasksCog(commands.Cog):
     @tasks.loop(minutes=15)  # Temporariamente rodando a cada minuto para testes
     async def enviar_aviso_excel(self):
         try:
-            self.task_enviar_aviso_excel_logger.info("Iniciando a execução da task 'enviar_aviso_excel'.")
+            self.task_enviar_aviso_excel_logger.info(
+                "Iniciando a execução da task 'enviar_aviso_excel'."
+            )
             worksheet = conectar_google_sheets()
             if worksheet is None:
-                self.task_enviar_aviso_excel_logger.error("Não foi possível conectar ao Google Sheets.")
+                self.task_enviar_aviso_excel_logger.error(
+                    "Não foi possível conectar ao Google Sheets."
+                )
                 return
 
             # Obter todas as linhas da planilha como dicionários
@@ -397,10 +457,14 @@ class TasksCog(commands.Cog):
             )
 
             for registro in registros:
-                self.task_enviar_aviso_excel_logger.debug(f"Processando registro: {registro}")
+                self.task_enviar_aviso_excel_logger.debug(
+                    f"Processando registro: {registro}"
+                )
                 # Verificar se o aviso já foi enviado
                 enviado = registro.get("Enviado", "").strip().upper()
-                self.task_enviar_aviso_excel_logger.debug(f"Aviso ID {registro.get('ID')}: Enviado = {enviado}")
+                self.task_enviar_aviso_excel_logger.debug(
+                    f"Aviso ID {registro.get('ID')}: Enviado = {enviado}"
+                )
 
                 if enviado != "TRUE":
                     canal_id = registro.get("Canal_ID")
@@ -462,14 +526,18 @@ class TasksCog(commands.Cog):
                                         f"Erro ao atualizar a planilha para aviso ID {id_aviso}: {update_exc}"
                                     )
                             else:
-                                self.task_enviar_aviso_excel_logger.error(f"Canal com ID {canal_id} não encontrado.")
+                                self.task_enviar_aviso_excel_logger.error(
+                                    f"Canal com ID {canal_id} não encontrado."
+                                )
                                 print(f"Canal com ID {canal_id} não encontrado.")
                         except Exception as send_exc:
                             self.task_enviar_aviso_excel_logger.exception(
                                 f"Erro ao enviar mensagem para o canal {canal_id}: {send_exc}"
                             )
         except Exception as e:
-            self.task_enviar_aviso_excel_logger.exception(f"Erro na task enviar_aviso_excel: {e}")
+            self.task_enviar_aviso_excel_logger.exception(
+                f"Erro na task enviar_aviso_excel: {e}"
+            )
             print(f"Erro na task enviar_aviso_excel: {e}")
 
     @enviar_aviso_excel.before_loop
@@ -477,8 +545,6 @@ class TasksCog(commands.Cog):
         await self.bot.wait_until_ready()
         self.task_enviar_aviso_excel_logger.info("Tarefa enviar_aviso_excel iniciada.")
         print("Tarefa enviar_aviso_excel iniciada.")
-
-
 
     # =====================================================
     # Task: MUNDO ANIMAL (Enviar mensagem a cada 10 dias)
@@ -490,8 +556,14 @@ class TasksCog(commands.Cog):
             today = now.date()
 
             # Recuperar a última data de envio do banco de dados
-            setting = session.query(Settings).filter_by(key="last_mundo_animal_sent").first()
-            last_sent_date = datetime.datetime.strptime(setting.value, "%Y-%m-%d").date() if setting else None
+            setting = (
+                session.query(Settings).filter_by(key="last_mundo_animal_sent").first()
+            )
+            last_sent_date = (
+                datetime.datetime.strptime(setting.value, "%Y-%m-%d").date()
+                if setting
+                else None
+            )
 
             if setting:
                 days_since_last = (today - last_sent_date).days
@@ -506,11 +578,15 @@ class TasksCog(commands.Cog):
                 message = random.choice(MUNDO_ANIMAL_MESSAGES)
 
                 # Escolher uma hora aleatória entre 15h e 23h
-                send_hour = random.randint(15, 22)  # 22 para garantir que a hora não ultrapasse 23h após random minutos
+                send_hour = random.randint(
+                    15, 22
+                )  # 22 para garantir que a hora não ultrapasse 23h após random minutos
                 send_minute = random.randint(0, 59)
 
                 # Calcular o tempo atual e o tempo de envio
-                send_time = now.replace(hour=send_hour, minute=send_minute, second=0, microsecond=0)
+                send_time = now.replace(
+                    hour=send_hour, minute=send_minute, second=0, microsecond=0
+                )
 
                 # Se o tempo de envio já passou hoje, agendar para amanhã
                 if send_time < now:
@@ -518,7 +594,9 @@ class TasksCog(commands.Cog):
 
                 delay = (send_time - now).total_seconds()
 
-                self.task_mundo_animal_logger.info(f"Mensagem MUNDO ANIMAL agendada para {send_time.strftime('%Y-%m-%d %H:%M:%S')}.")
+                self.task_mundo_animal_logger.info(
+                    f"Mensagem MUNDO ANIMAL agendada para {send_time.strftime('%Y-%m-%d %H:%M:%S')}."
+                )
 
                 # Esperar até o tempo de envio
                 await asyncio.sleep(delay)
@@ -541,20 +619,31 @@ class TasksCog(commands.Cog):
                             setting.value = today.strftime("%Y-%m-%d")
                         else:
                             new_setting = Settings(
-                                key="last_mundo_animal_sent", value=today.strftime("%Y-%m-%d")
+                                key="last_mundo_animal_sent",
+                                value=today.strftime("%Y-%m-%d"),
                             )
                             session.add(new_setting)
                         session.commit()
                     except Exception as e:
-                        self.task_mundo_animal_logger.exception(f"Erro ao enviar mensagem MUNDO ANIMAL: {e}")
+                        self.task_mundo_animal_logger.exception(
+                            f"Erro ao enviar mensagem MUNDO ANIMAL: {e}"
+                        )
                 else:
-                    self.task_mundo_animal_logger.error(f"Canal com ID {CANAL_DOIS_ID} não encontrado.")
+                    self.task_mundo_animal_logger.error(
+                        f"Canal com ID {CANAL_DOIS_ID} não encontrado."
+                    )
                     print(f"Canal com ID {CANAL_DOIS_ID} não encontrado.")
             else:
-                self.task_mundo_animal_logger.info(f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem MUNDO ANIMAL.")
-                print(f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem MUNDO ANIMAL.")
+                self.task_mundo_animal_logger.info(
+                    f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem MUNDO ANIMAL."
+                )
+                print(
+                    f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem MUNDO ANIMAL."
+                )
         except Exception as e:
-            self.task_mundo_animal_logger.exception(f"Erro na task mundo_animal_task: {e}")
+            self.task_mundo_animal_logger.exception(
+                f"Erro na task mundo_animal_task: {e}"
+            )
 
     @mundo_animal_task.before_loop
     async def before_mundo_animal_task(self):
@@ -564,7 +653,8 @@ class TasksCog(commands.Cog):
 
     # Método auxiliar para obter o tempo atual com fuso horário
     def get_now(self):
-        return datetime.datetime.now(TIMEZONE)# cogs/tasks_cog.py
+        return datetime.datetime.now(TIMEZONE)  # cogs/tasks_cog.py
+
 
 import os
 from google.oauth2.service_account import Credentials
@@ -600,6 +690,7 @@ import logging
 def get_now():
     return datetime.datetime.now(TIMEZONE)
 
+
 # Função para conectar ao Google Sheets (em stand by)
 def conectar_google_sheets():
     """Conecta-se ao Google Sheets e retorna a worksheet especificada."""
@@ -619,20 +710,37 @@ def conectar_google_sheets():
         # O log de erro será tratado pela task que chama esta função
         raise e
 
+
 class TasksCog(commands.Cog):
     def __init__(self, bot: commands.Bot, geral_logger: logging.Logger):
         self.bot = bot
         self.geral_logger = geral_logger
 
         # Configuração dos loggers específicos para cada task
-        self.task_semanal_logger = self.setup_logger("discord_bot.task_semanal", "task_semanal.log")
-        self.task_good_afternoon_logger = self.setup_logger("discord_bot.task_good_afternoon", "task_good_afternoon.log")
-        self.task_ajustar_ponto_logger = self.setup_logger("discord_bot.task_ajustar_ponto", "ajustar_ponto.log")
-        self.task_quinzenal_logger = self.setup_logger("discord_bot.task_quinzenal", "quinzenal_message.log")
-        self.task_enviar_realocacao_ticket_logger = self.setup_logger("discord_bot.task_enviar_realocacao_ticket", "enviar_realocacao_ticket.log")
-        self.task_oracle_configuracao_logger = self.setup_logger("discord_bot.task_oracle_configuracao", "oracle_configuracao.log")
-        self.task_enviar_aviso_excel_logger = self.setup_logger("discord_bot.task_enviar_aviso_excel", "enviar_aviso_excel.log")
-        self.task_cahamada_logger = self.setup_logger("discord_bot.task_cahamada", "cahamada.log")  # Novo logger
+        self.task_semanal_logger = self.setup_logger(
+            "discord_bot.task_semanal", "task_semanal.log"
+        )
+        self.task_good_afternoon_logger = self.setup_logger(
+            "discord_bot.task_good_afternoon", "task_good_afternoon.log"
+        )
+        self.task_ajustar_ponto_logger = self.setup_logger(
+            "discord_bot.task_ajustar_ponto", "ajustar_ponto.log"
+        )
+        self.task_quinzenal_logger = self.setup_logger(
+            "discord_bot.task_quinzenal", "quinzenal_message.log"
+        )
+        self.task_enviar_realocacao_ticket_logger = self.setup_logger(
+            "discord_bot.task_enviar_realocacao_ticket", "enviar_realocacao_ticket.log"
+        )
+        self.task_oracle_configuracao_logger = self.setup_logger(
+            "discord_bot.task_oracle_configuracao", "oracle_configuracao.log"
+        )
+        self.task_enviar_aviso_excel_logger = self.setup_logger(
+            "discord_bot.task_enviar_aviso_excel", "enviar_aviso_excel.log"
+        )
+        self.task_cahamada_logger = self.setup_logger(
+            "discord_bot.task_cahamada", "cahamada.log"
+        )  # Novo logger
 
         # Iniciar as tasks (elas só rodam quando o bot está pronto).
         self.semanal_message_task.start()
@@ -650,8 +758,10 @@ class TasksCog(commands.Cog):
         """
         logger = logging.getLogger(logger_name)
         logger.setLevel(logging.INFO)
-        log_file_path = os.path.join('logs', log_filename)
-        handler = logging.FileHandler(filename=log_file_path, encoding="utf-8", mode="a")
+        log_file_path = os.path.join("logs", log_filename)
+        handler = logging.FileHandler(
+            filename=log_file_path, encoding="utf-8", mode="a"
+        )
         formatter = logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
@@ -662,8 +772,12 @@ class TasksCog(commands.Cog):
     # =====================================================
     @commands.Cog.listener()
     async def on_ready(self):
-        self.geral_logger.info(f"INICIALIZAÇÃO - Cog de Tasks carregado! Bot conectado como {self.bot.user}")
-        print(f"INICIALIZAÇÃO - Cog de Tasks carregado! Bot conectado como {self.bot.user}")
+        self.geral_logger.info(
+            f"INICIALIZAÇÃO - Cog de Tasks carregado! Bot conectado como {self.bot.user}"
+        )
+        print(
+            f"INICIALIZAÇÃO - Cog de Tasks carregado! Bot conectado como {self.bot.user}"
+        )
 
     # =====================================================
     # Tarefa: Mensagem Semanal (uma vez por semana, qualquer dia entre 09:00 e 18:00)
@@ -708,7 +822,9 @@ class TasksCog(commands.Cog):
                                 session.add(new_setting)
                             session.commit()
                         except Exception as e:
-                            self.task_semanal_logger.exception(f"Erro ao enviar mensagem semanal: {e}")
+                            self.task_semanal_logger.exception(
+                                f"Erro ao enviar mensagem semanal: {e}"
+                            )
                             print(f"Erro ao enviar mensagem semanal: {e}")
                     else:
                         self.task_semanal_logger.error(
@@ -716,10 +832,14 @@ class TasksCog(commands.Cog):
                         )
                         print(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
             else:
-                self.task_semanal_logger.info("Mensagem semanal já foi enviada esta semana.")
+                self.task_semanal_logger.info(
+                    "Mensagem semanal já foi enviada esta semana."
+                )
                 print("Mensagem semanal já foi enviada esta semana.")
         except Exception as e:
-            self.task_semanal_logger.exception(f"Erro na task semanal_message_task: {e}")
+            self.task_semanal_logger.exception(
+                f"Erro na task semanal_message_task: {e}"
+            )
 
     @semanal_message_task.before_loop
     async def before_semanal_message_task(self):
@@ -746,7 +866,9 @@ class TasksCog(commands.Cog):
         canais = self.listar_canais_acessiveis()
         mensagem = "Canais que o bot pode acessar:\n"
         for guild_name, channel_id, channel_name in canais:
-            mensagem += f"Guilda: {guild_name} | ID: {channel_id} | Nome: {channel_name}\n"
+            mensagem += (
+                f"Guilda: {guild_name} | ID: {channel_id} | Nome: {channel_name}\n"
+            )
         await ctx.send(mensagem)
 
     # =====================================================
@@ -766,11 +888,17 @@ class TasksCog(commands.Cog):
                         f"[{now.strftime('%H:%M:%S')}] Mensagem de teste enviada no canal {GOOD_AFTERNOON_CHANNEL_ID}."
                     )
                 except Exception as e:
-                    self.task_good_afternoon_logger.exception(f"Erro ao enviar mensagem de teste: {e}")
+                    self.task_good_afternoon_logger.exception(
+                        f"Erro ao enviar mensagem de teste: {e}"
+                    )
             else:
-                self.task_good_afternoon_logger.error(f"Canal com ID {GOOD_AFTERNOON_CHANNEL_ID} não encontrado.")
+                self.task_good_afternoon_logger.error(
+                    f"Canal com ID {GOOD_AFTERNOON_CHANNEL_ID} não encontrado."
+                )
         except Exception as e:
-            self.task_good_afternoon_logger.exception(f"Erro na task send_good_afternoon_message: {e}")
+            self.task_good_afternoon_logger.exception(
+                f"Erro na task send_good_afternoon_message: {e}"
+            )
 
     # =====================================================
     # Tarefa para enviar lembrete de ajustar ponto
@@ -799,11 +927,17 @@ class TasksCog(commands.Cog):
                             f"[{now.strftime('%Y-%m-%d %H:%M')}] Alerta de ponto enviado no canal {AVISOS_GERAIS_CANAL}."
                         )
                     except Exception as e:
-                        self.task_ajustar_ponto_logger.exception(f"Erro ao enviar alerta de ponto: {e}")
+                        self.task_ajustar_ponto_logger.exception(
+                            f"Erro ao enviar alerta de ponto: {e}"
+                        )
                 else:
-                    self.task_ajustar_ponto_logger.error(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
+                    self.task_ajustar_ponto_logger.error(
+                        f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado."
+                    )
         except Exception as e:
-            self.task_ajustar_ponto_logger.exception(f"Erro na task ajustar_ponto_task: {e}")
+            self.task_ajustar_ponto_logger.exception(
+                f"Erro na task ajustar_ponto_task: {e}"
+            )
 
     # =====================================================
     # Tarefa para enviar mensagem quinzenalmente
@@ -830,9 +964,13 @@ class TasksCog(commands.Cog):
                                 f"Erro ao enviar mensagem quinzenal no canal {channel_id}: {e}"
                             )
                 # Atualiza o índice (rotação circular)
-                self.quinzenal_index = (self.quinzenal_index + 1) % len(QUINZENAL_MESSAGES)
+                self.quinzenal_index = (self.quinzenal_index + 1) % len(
+                    QUINZENAL_MESSAGES
+                )
         except Exception as e:
-            self.task_quinzenal_logger.exception(f"Erro na task quinzenal_message_task: {e}")
+            self.task_quinzenal_logger.exception(
+                f"Erro na task quinzenal_message_task: {e}"
+            )
 
     @quinzenal_message_task.before_loop
     async def before_quinzenal_message_task(self):
@@ -870,9 +1008,13 @@ class TasksCog(commands.Cog):
                             f"Erro ao enviar mensagem de realocação no canal {REALOCACAO_CANAL}: {e}"
                         )
                 else:
-                    self.task_enviar_realocacao_ticket_logger.error(f"Canal com ID {REALOCACAO_CANAL} não encontrado.")
+                    self.task_enviar_realocacao_ticket_logger.error(
+                        f"Canal com ID {REALOCACAO_CANAL} não encontrado."
+                    )
         except Exception as e:
-            self.task_enviar_realocacao_ticket_logger.exception(f"Erro na task enviar_realocacao_ticket: {e}")
+            self.task_enviar_realocacao_ticket_logger.exception(
+                f"Erro na task enviar_realocacao_ticket: {e}"
+            )
 
     # =====================================================
     # Task: Enviar Mensagem Oracle Configuração (Mensal)
@@ -915,26 +1057,37 @@ class TasksCog(commands.Cog):
                                 setting.value = str(current_month)
                             else:
                                 new_setting = Settings(
-                                    key="last_month_oracle_sent", value=str(current_month)
+                                    key="last_month_oracle_sent",
+                                    value=str(current_month),
                                 )
                                 session.add(new_setting)
                             session.commit()
                         except Exception as e:
-                            self.task_oracle_configuracao_logger.exception(f"Erro ao enviar mensagem Oracle: {e}")
+                            self.task_oracle_configuracao_logger.exception(
+                                f"Erro ao enviar mensagem Oracle: {e}"
+                            )
                             print(f"Erro ao enviar mensagem Oracle: {e}")
                     else:
-                        self.task_oracle_configuracao_logger.error(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
+                        self.task_oracle_configuracao_logger.error(
+                            f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado."
+                        )
                         print(f"Canal com ID {AVISOS_GERAIS_CANAL} não encontrado.")
             else:
-                self.task_oracle_configuracao_logger.info("Mensagem Oracle já foi enviada este mês.")
+                self.task_oracle_configuracao_logger.info(
+                    "Mensagem Oracle já foi enviada este mês."
+                )
                 print("Mensagem Oracle já foi enviada este mês.")
         except Exception as e:
-            self.task_oracle_configuracao_logger.exception(f"Erro na task oracle_configuracao_task: {e}")
+            self.task_oracle_configuracao_logger.exception(
+                f"Erro na task oracle_configuracao_task: {e}"
+            )
 
     @oracle_configuracao_task.before_loop
     async def before_oracle_configuracao_task(self):
         await self.bot.wait_until_ready()
-        self.task_oracle_configuracao_logger.info("Tarefa oracle_configuracao_task iniciada.")
+        self.task_oracle_configuracao_logger.info(
+            "Tarefa oracle_configuracao_task iniciada."
+        )
         print("Tarefa oracle_configuracao_task iniciada.")
 
     # =====================================================
@@ -943,10 +1096,14 @@ class TasksCog(commands.Cog):
     @tasks.loop(minutes=15)  # Temporariamente rodando a cada minuto para testes
     async def enviar_aviso_excel(self):
         try:
-            self.task_enviar_aviso_excel_logger.info("Iniciando a execução da task 'enviar_aviso_excel'.")
+            self.task_enviar_aviso_excel_logger.info(
+                "Iniciando a execução da task 'enviar_aviso_excel'."
+            )
             worksheet = conectar_google_sheets()
             if worksheet is None:
-                self.task_enviar_aviso_excel_logger.error("Não foi possível conectar ao Google Sheets.")
+                self.task_enviar_aviso_excel_logger.error(
+                    "Não foi possível conectar ao Google Sheets."
+                )
                 return
 
             # Obter todas as linhas da planilha como dicionários
@@ -956,10 +1113,14 @@ class TasksCog(commands.Cog):
             )
 
             for registro in registros:
-                self.task_enviar_aviso_excel_logger.debug(f"Processando registro: {registro}")
+                self.task_enviar_aviso_excel_logger.debug(
+                    f"Processando registro: {registro}"
+                )
                 # Verificar se o aviso já foi enviado
                 enviado = registro.get("Enviado", "").strip().upper()
-                self.task_enviar_aviso_excel_logger.debug(f"Aviso ID {registro.get('ID')}: Enviado = {enviado}")
+                self.task_enviar_aviso_excel_logger.debug(
+                    f"Aviso ID {registro.get('ID')}: Enviado = {enviado}"
+                )
 
                 if enviado != "TRUE":
                     canal_id = registro.get("Canal_ID")
@@ -1021,14 +1182,18 @@ class TasksCog(commands.Cog):
                                         f"Erro ao atualizar a planilha para aviso ID {id_aviso}: {update_exc}"
                                     )
                             else:
-                                self.task_enviar_aviso_excel_logger.error(f"Canal com ID {canal_id} não encontrado.")
+                                self.task_enviar_aviso_excel_logger.error(
+                                    f"Canal com ID {canal_id} não encontrado."
+                                )
                                 print(f"Canal com ID {canal_id} não encontrado.")
                         except Exception as send_exc:
                             self.task_enviar_aviso_excel_logger.exception(
                                 f"Erro ao enviar mensagem para o canal {canal_id}: {send_exc}"
                             )
         except Exception as e:
-            self.task_enviar_aviso_excel_logger.exception(f"Erro na task enviar_aviso_excel: {e}")
+            self.task_enviar_aviso_excel_logger.exception(
+                f"Erro na task enviar_aviso_excel: {e}"
+            )
             print(f"Erro na task enviar_aviso_excel: {e}")
 
     @enviar_aviso_excel.before_loop
@@ -1047,8 +1212,14 @@ class TasksCog(commands.Cog):
             today = now.date()
 
             # Recuperar a última data de envio do banco de dados
-            setting = session.query(Settings).filter_by(key="last_cahamada_sent").first()
-            last_sent_date = datetime.datetime.strptime(setting.value, "%Y-%m-%d").date() if setting else None
+            setting = (
+                session.query(Settings).filter_by(key="last_cahamada_sent").first()
+            )
+            last_sent_date = (
+                datetime.datetime.strptime(setting.value, "%Y-%m-%d").date()
+                if setting
+                else None
+            )
 
             if setting:
                 days_since_last = (today - last_sent_date).days
@@ -1063,11 +1234,15 @@ class TasksCog(commands.Cog):
                 message = random.choice(CAHAMADA_MESSAGES)
 
                 # Escolher uma hora aleatória entre 15h e 23h
-                send_hour = random.randint(15, 22)  # 22 para garantir que a hora não ultrapasse 23h após random minutos
+                send_hour = random.randint(
+                    15, 22
+                )  # 22 para garantir que a hora não ultrapasse 23h após random minutos
                 send_minute = random.randint(0, 59)
 
                 # Calcular o tempo atual e o tempo de envio
-                send_time = now.replace(hour=send_hour, minute=send_minute, second=0, microsecond=0)
+                send_time = now.replace(
+                    hour=send_hour, minute=send_minute, second=0, microsecond=0
+                )
 
                 # Se o tempo de envio já passou hoje, agendar para amanhã
                 if send_time < now:
@@ -1075,7 +1250,9 @@ class TasksCog(commands.Cog):
 
                 delay = (send_time - now).total_seconds()
 
-                self.task_cahamada_logger.info(f"Mensagem CAHAMADA agendada para {send_time.strftime('%Y-%m-%d %H:%M:%S')}.")
+                self.task_cahamada_logger.info(
+                    f"Mensagem CAHAMADA agendada para {send_time.strftime('%Y-%m-%d %H:%M:%S')}."
+                )
 
                 # Esperar até o tempo de envio
                 await asyncio.sleep(delay)
@@ -1098,18 +1275,27 @@ class TasksCog(commands.Cog):
                             setting.value = today.strftime("%Y-%m-%d")
                         else:
                             new_setting = Settings(
-                                key="last_cahamada_sent", value=today.strftime("%Y-%m-%d")
+                                key="last_cahamada_sent",
+                                value=today.strftime("%Y-%m-%d"),
                             )
                             session.add(new_setting)
                         session.commit()
                     except Exception as e:
-                        self.task_cahamada_logger.exception(f"Erro ao enviar mensagem CAHAMADA: {e}")
+                        self.task_cahamada_logger.exception(
+                            f"Erro ao enviar mensagem CAHAMADA: {e}"
+                        )
                 else:
-                    self.task_cahamada_logger.error(f"Canal com ID {CANAL_DOIS_ID} não encontrado.")
+                    self.task_cahamada_logger.error(
+                        f"Canal com ID {CANAL_DOIS_ID} não encontrado."
+                    )
                     print(f"Canal com ID {CANAL_DOIS_ID} não encontrado.")
             else:
-                self.task_cahamada_logger.info(f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem CAHAMADA.")
-                print(f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem CAHAMADA.")
+                self.task_cahamada_logger.info(
+                    f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem CAHAMADA."
+                )
+                print(
+                    f"Ainda faltam {required_days - days_since_last} dias para a próxima mensagem CAHAMADA."
+                )
         except Exception as e:
             self.task_cahamada_logger.exception(f"Erro na task cahamada_task: {e}")
 

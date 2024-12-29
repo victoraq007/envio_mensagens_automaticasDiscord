@@ -5,8 +5,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class Settings(Base):
-    __tablename__ = 'settings'
+    __tablename__ = "settings"
     id = Column(Integer, primary_key=True)
     key = Column(String(50), unique=True, nullable=False)
     value = Column(String(100), nullable=False)
