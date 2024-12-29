@@ -17,7 +17,7 @@ TOKEN = "SEU_TOKEN_AQUI" ## Token discord
 # IDs dos canais (Substitua pelos IDs reais)
 GOOD_AFTERNOON_CHANNEL_ID = 123456789012345678  # Canal de boas tardes
 AVISOS_GERAIS_CANAL = 123456789012345678       # Canal de avisos gerais
-CANAL_DOIS_ID = 123456789012345678  # Canal retail_noite
+CANAL_DOIS_ID = 123456789012345678  # Canal exemplo dois
 
 
 # Outros IDs e configurações
